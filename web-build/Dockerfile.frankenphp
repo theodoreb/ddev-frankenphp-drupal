@@ -1,6 +1,9 @@
 #ddev-generated
-#ARG BASE_IMAGE
-#FROM $BASE_IMAGE
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+ENV XDG_CONFIG_HOME=/mnt/ddev_config/
+ENV XDG_DATA_HOME=/mnt/ddev-global-cache/caddy
 
 FROM dunglas/frankenphp:1.1.2-php8.3
 
