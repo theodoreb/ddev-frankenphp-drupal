@@ -2,6 +2,10 @@
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
 
+ENV XDG_CONFIG_HOME=/mnt/ddev_config/
+# i know just trying stuff
+ENV XDG_DATA_HOME=/mnt/ddev_config/
+
 FROM dunglas/frankenphp:1.1.2-php8.3
 
 # add additional extensions here:
