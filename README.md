@@ -10,7 +10,7 @@ Plugin created from https://github.com/ochorocho/ddev-frankenphp
 ## Installation
 
 ```bash
-ddev get theodoreb/ddev-frankenphp && ddev restart
+ddev get theodoreb/ddev-frankenphp-drupal && ddev restart
 ```
 
 ## Configuration

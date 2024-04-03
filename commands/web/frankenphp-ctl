@@ -14,8 +14,8 @@ done
 
 caddy_domains=${caddy_domains%, *}
 
-caddyfile=$(yq '.caddyfile' /mnt/ddev_config/frankenphp/config.yaml)
-envfile=$(yq '.envfile' /mnt/ddev_config/frankenphp/config.yaml)
+caddyfile=/mnt/ddev_config/frankenphp/Caddyfile
+envfile=/mnt/ddev_config/frankenphp/.env
 
 if [ $CMD = start ]; then
     SERVER_NAME="$caddy_domains" \
