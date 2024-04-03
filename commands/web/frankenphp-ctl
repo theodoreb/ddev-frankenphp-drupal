@@ -19,7 +19,7 @@ envfile=$(yq '.envfile' /mnt/ddev_config/frankenphp/config.yaml)
 
 if [ $CMD = start ]; then
     SERVER_NAME="$caddy_domains" \
-    MERCURE_PUBLIC_URL="$DDEV_PRIMARY_URL/.well-known/mercure" \
+    #MERCURE_PUBLIC_URL="$DDEV_PRIMARY_URL/.well-known/mercure" \
     frankenphp run --resume --watch -c "$caddyfile" --envfile "$envfile" --pidfile /tmp/frankenphp.pid
 # usage
 else

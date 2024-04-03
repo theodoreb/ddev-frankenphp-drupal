@@ -1,4 +1,6 @@
 #ddev-generated
+
+# Adapted from https://caddy.community/t/caddyfile-for-drupal-10/21607/5
 {
 	{$CADDY_GLOBAL_OPTIONS}
 
@@ -7,65 +9,39 @@
 	}
 
 	# https://caddyserver.com/docs/caddyfile/directives#sorting-algorithm
-	order mercure after encode
-	order vulcain after reverse_proxy
 	order php_server before file_server
 	order php before file_server
-
-	# Enable prometheus metrics
-    servers {
-        metrics
-    }
 }
 
 {$CADDY_EXTRA_CONFIG}
 
 {$SERVER_NAME:localhost} {
-	log {
-		# Redact the authorization query parameter that can be set by Mercure
-		format filter {
-			wrap console
-			fields {
-				uri query {
-					replace authorization REDACTED
-				}
-			}
-		}
-	}
-
 	root * public/
+	encode zstd br gzip
 
-    @app {
-        path /*
-        not path /.well-known/* /_assets/* /favicon.ico
-        file {
-            try_files {path} /index.php
-            split_path .php
-        }
-    }
-    rewrite @app {http.matchers.file.relative}
+	@hiddenPhpFilesRegexp path_regexp \..*/.*\.php$
+	error @hiddenPhpFilesRegexp 403
 
-	encode zstd gzip
+	@notFoundPhpFiles path_regexp /vendor/.*\.php$
+	error @notFoundPhpFiles 404
 
-	# Enable Mercure hub
-	mercure {
-		# Transport to use (default to Bolt)
-		transport_url {$MERCURE_TRANSPORT_URL:bolt:///data/mercure.db}
-		# Publisher JWT key
-		publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
-		# Subscriber JWT key
-		subscriber_jwt {env.MERCURE_SUBSCRIBER_JWT_KEY} {env.MERCURE_SUBSCRIBER_JWT_ALG}
-		# Allow anonymous subscribers (double-check that it's what you want)
-		anonymous
-		# Enable the subscription API (double-check that it's what you want)
-		subscriptions
-		# Extra directives
-		{$MERCURE_EXTRA_DIRECTIVES}
+	@notFoundPhpFilesRegexp path_regexp ^/sites/[^/]+/files/.*\.php$
+	error @notFoundPhpFilesRegexp 404
 
-        # Development only, enables the mercure UI
-		demo
+	@privateDirRegexp path_regexp ^/sites/.*/private/
+	error @privateDirRegexp 403
+
+	@protectedFilesRegexp {
+		not path /.well-known*
+		path_regexp \.(engine|inc|install|make|module|profile|po|sh|.*sql|theme|twig|tpl(\.php)?|xtmpl|yml)(~|\.sw[op]|\.bak|\.orig|\.save)?$|^/(\..*|Entries.*|Repository|Root|Tag|Template|composer\.(json|lock)|web\.config|yarn\.lock|package\.json)$|^\/#.*#$|\.php(~|\.sw[op]|\.bak|\.orig|\.save)$
 	}
-	#vulcain
+	error @protectedFilesRegexp 403
+
+	@static {
+		file
+		path *.avif *.css *.eot *.gif *.gz *.ico *.jpg *.jpeg *.js *.otf *.pdf *.png *.svg *.ttf *.webp *.woff *.woff2
+	}
+	header @static Cache-Control "max-age=31536000,public,immutable"
 
 	{$CADDY_SERVER_EXTRA_DIRECTIVES}
 

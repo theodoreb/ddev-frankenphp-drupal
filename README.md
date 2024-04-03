@@ -5,14 +5,12 @@ with [FrankenPHP](https://frankenphp.dev/).
 
 FrankenPHP is a modern PHP App Server, written in Go.
 
-## Why?
-
-The WHY!
+Plugin created from https://github.com/ochorocho/ddev-frankenphp
 
 ## Installation
 
 ```bash
-ddev get ochorocho/ddev-frankenphp && ddev restart
+ddev get theodoreb/ddev-frankenphp && ddev restart
 ```
 
 ## Configuration
