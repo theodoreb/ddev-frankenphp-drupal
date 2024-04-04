@@ -1,29 +1,12 @@
 #ddev-generated
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
+ENV FRANKENPHP_VERSION=v1.1.2
 
-ENV XDG_CONFIG_HOME=/mnt/ddev_config/
-# i know just trying stuff
-ENV XDG_DATA_HOME=/mnt/ddev_config/
-
-FROM dunglas/frankenphp:1.1.2-php8.3
-
-# add additional extensions here:
-RUN install-php-extensions pdo_mysql gd intl zip xml curl json openssl mbstring apcu readline opcache
-
-ARG USER=www-data
-
-RUN \
-	# Use "adduser -D ${USER}" for alpine based distros
-	useradd -D ${USER}; \
-	# Add additional capability to bind to port 80 and 443
-	setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp; \
-	# Give write access to /data/caddy and /config/caddy
-	chown -R ${USER}:${USER} /data/caddy && chown -R ${USER}:${USER} /config/caddy;
-
-USER ${USER}
+RUN curl --fail -L -o /usr/local/bin/frankenphp https://github.com/dunglas/frankenphp/releases/download/${FRANKENPHP_VERSION}/frankenphp-linux-$(uname -m) && \
+    chmod +x /usr/local/bin/frankenphp
 
 ENTRYPOINT ["/mnt/ddev_config/commands/web/frankenphp-ctl", "start"]
 
 # See if frankenphp is running
-#HEALTHCHECK --interval=1s --timeout=120s --retries=1 --start-period=120s CMD ps -p $(cat /tmp/frankenphp.pid) > /dev/null; exit $?
+HEALTHCHECK --interval=1s --timeout=120s --retries=1 --start-period=120s CMD ps -p $(cat /tmp/frankenphp.pid) > /dev/null; exit $?
